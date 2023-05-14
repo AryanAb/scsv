@@ -10,14 +10,13 @@
  * is buffered with the max size of the buffer specified.
  *
  * @param path the path to the csv file.
- * @param max_rows the maximum number of rows to be allocated in the buffer
- * @param max_cols the maximum number of columns to be allocated in the buffer
+ * @param temp the path to the temporary file created in the /tmp directory
  *
- * @return a 2d table of strings representing the csv table
+ * @return an integer indicating if the parsing was successful or not
 */
 int parse_csv(char *path, char *temp)
 {
-	FILE *res;
+	int res;
 	FILE *fp;
 	char *line = NULL;
 	size_t len = 0;
@@ -53,6 +52,14 @@ int parse_csv(char *path, char *temp)
 }
 
 
+/**
+ * Parses a single line of the csv file and stores the result in an array of strings.
+ *
+ * @param csv_table_row the 2d array of strings in which the entries are stored
+ * @param line the line that is to be parsed
+ *
+ * @return an integer indicating if the parsing was successful or not
+ */
 static int parse_line(char **csv_table_row, char *line)
 {
 	char *token = strtok_csv(line, ",");
@@ -75,6 +82,14 @@ static int parse_line(char **csv_table_row, char *line)
 }
 
 
+/**
+ * Shortens strings of lengths greater than a certain amount and appends ellipses.
+ * That certain amount is defined by the macro MAX_STR_LENGTH.
+ *
+ * @param str the string to be ellipsized
+ *
+ * @return a heap allocated string that is either ellipsized or unchanged
+ */
 static char *ellipsize(char *str)
 {
 	size_t len = strlen(str);
@@ -94,6 +109,15 @@ static char *ellipsize(char *str)
 	return estr;
 }
 
+
+/**
+ * Similar to strtok, but handles empty substrings.
+ *
+ * @param str the string that is to be tokenized
+ * @param delimiter the delimiter used to tokenize str with
+ *
+ * @return the substring in str before the next occurance of delimiter
+ */
 static char *strtok_csv(char *str, const char *delimiter)
 {
 	static char *source = NULL;
@@ -112,6 +136,13 @@ static char *strtok_csv(char *str, const char *delimiter)
 	return res;
 }
 
+
+/**
+ * Finds the number of occurances of a character in a string.
+ *
+ * @param str the string to search in
+ * @param c the character to search for
+ */
 static inline size_t num_char(char *str, char c)
 {
 	size_t res = 0;
