@@ -1,10 +1,8 @@
 #include "parse.h"
-#include "utility.h"
-#include "display.h"
-#include "csv.h"
+#include "format.h"
 
 #include <stdio.h>
-#include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char *argv[])
@@ -27,42 +25,44 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	initscr();
 	if (argc == 2)
 	{
-		endwin();
+		char *path = argv[1];
+		remove(TEMP_BASE);
+		
+		parse_csv(path, TEMP_BASE);
+
+		char *cmd = "less";
+		char *argv[4];
+		argv[0] = "less";
+		argv[1] = "-S";
+		argv[2] = TEMP_BASE;
+		argv[3] = NULL;
+		execvp(cmd, argv);
 		return 0;
 	}
 	
 	if (argc == 3)
 	{
-		char *path = argv[1];
-		char *flag = argv[2];
+		char *flag = argv[1];
+		char *path = argv[2];
 
+		char temp[FILENAME_MAX] = TEMP_BASE;
+		strcat(temp, path);
+		remove(temp);
+		
 		// display in simplified form
 		if (strcmp(flag, "-s") == 0)
 		{
-			int res, max_x, max_y;
-			getmaxyx(stdscr, max_y, max_x);
+			parse_csv(path, TEMP_BASE);
 			
-			// calculate maximum number of displayable rows and columns
-			int max_cols = min(MAX_COLS, (max_x - 1) / (MAX_STR_LENGTH + 3));
-			int max_rows = min(MAX_ROWS, (max_y - 1) / 2);
-
-			struct CSV csv;
-			res = create_CSV(&csv, max_rows, max_cols);
-			res = parse_csv(&csv, path, max_rows, max_cols);
-			if (res == -1)
-			{
-				printf("Inconsistent number of fields in rows\r\n");
-				endwin();
-				return 1;
-			}
-			
-			display(&csv);
-			
-			destroy_CSV(&csv);
-			endwin();
+			char *cmd = "cat";
+			char *argv[3];
+			argv[0] = "cat";
+			argv[1] = TEMP_BASE;
+			argv[2] = NULL;
+			execvp(cmd, argv);
+			return 0;
 		}
 		
 		return 0;

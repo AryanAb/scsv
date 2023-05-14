@@ -1,7 +1,7 @@
 CC = clang
-CFLAGS = -Wall -lncurses -g
+CFLAGS = -Wall -g
 EXEC = scsv
-OBJECTS = src/csv.o src/display.o src/parse.o src/scsv.o
+OBJECTS = src/format.o src/parse.o src/scsv.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 ${EXEC}: ${OBJECTS}
